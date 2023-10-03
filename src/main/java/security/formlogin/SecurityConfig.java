@@ -1,10 +1,13 @@
 package security.formlogin;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -15,22 +18,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
                 )
-                .formLogin(formLogin -> formLogin
-//                        .loginPage("/loginPage") // 로그인 페이지 경로(로그인 페이지 custom 가능)
-                        .defaultSuccessUrl("/") // 로그인 성공 후 이동 페이지
-//                        .failureUrl("/login") // 로그인 실패 후 이동 페이지
-//                        .usernameParameter("userId") // 아이디 파라미터명 설정(html name명 설정)
-//                        .passwordParameter("passwd") // 패스워드 파라미터명 설정
-                        .loginProcessingUrl("/login_proc") // 로그인 html Form Action Url
-                        .successHandler((request, response, authentication) -> { // 로그인 성공 후 핸들러
-                            System.out.println("authentication : " + authentication.getName());
-                            response.sendRedirect("/");
+                .formLogin(withDefaults())
+                .logout(logout -> logout
+                        .logoutUrl("/logout") // 로그아웃 처리 URL
+                        .logoutSuccessUrl("/login") // 로그아웃 성공 후 이동 페이지
+                        .deleteCookies("remember-me") // 로그아웃 후 쿠키 삭제
+                        .addLogoutHandler((request, response, authentication) -> { // 로그아웃 핸들러
+                            HttpSession session = request.getSession();
+                            session.invalidate();   // 세션 무효화
                         })
-                        .failureHandler((request, response, exception) -> { // 로그인 실패 후 핸들러
-                            System.out.println("exception : " + exception.getMessage());
+                        .logoutSuccessHandler((request, response, authentication) -> { // 로그아웃 성공 후 핸들러
                             response.sendRedirect("/login");
                         })
-                        .permitAll() // 로그인 페이지는 누구나 접근 가능
                 );
         return http.build();
     }
