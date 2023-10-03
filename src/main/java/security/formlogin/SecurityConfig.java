@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -14,12 +15,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -27,23 +22,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(withDefaults())
-                .logout(logout -> logout
-                        .logoutUrl("/logout") // 로그아웃 처리 URL
-                        .logoutSuccessUrl("/login") // 로그아웃 성공 후 이동 페이지
-                        .deleteCookies("remember-me") // 로그아웃 후 쿠키 삭제
-                        .addLogoutHandler((request, response, authentication) -> { // 로그아웃 핸들러
-                            HttpSession session = request.getSession();
-                            session.invalidate();   // 세션 무효화
-                        })
-                        .logoutSuccessHandler((request, response, authentication) -> { // 로그아웃 성공 후 핸들러
-                            response.sendRedirect("/login");
-                        })
-                )
-                .rememberMe(rememberMe -> rememberMe
-                        .rememberMeParameter("remember") // 기본 파라미터명은 remember-me
-                        .tokenValiditySeconds(3600) // Default 14일
-                        .userDetailsService(userDetailsService)
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 세션 정책
+                        .sessionFixation().changeSessionId() // 세션 고정 보호(default), none: 세션 고정 공격에 당함, migrateSession, newSession
+                        .maximumSessions(1) // 최대 허용 가능 세션 수, -1은 무제한 로그인 세션 허용
+                        .maxSessionsPreventsLogin(false) // true 동시 로그인 차단(기존 세션 유지), false는 기존 세션 만료(default)
+                        .expiredUrl("/expired") // 세션이 만료된 경우 이동할 페이지
+//                                .sessionRegistry(sessionRegistry -> {}) // 세션 저장소 설정
+//                                .expiredSessionStrategy((expiredSessionStrategy) -> {}) // 세션 만료 후 처리
                 );
+
         return http.build();
     }
 }
