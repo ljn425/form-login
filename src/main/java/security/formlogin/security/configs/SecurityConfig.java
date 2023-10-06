@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 리소스 허용
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/users").permitAll()
                         .requestMatchers("/mypage").hasRole("USER")
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
