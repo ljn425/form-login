@@ -32,7 +32,12 @@ public class SecurityConfig {
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .formLogin(withDefaults());
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login_proc")
+                        .defaultSuccessUrl("/")
+                        .permitAll());
+
         return http.build();
     }
 

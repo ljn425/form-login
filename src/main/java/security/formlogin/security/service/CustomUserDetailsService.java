@@ -14,7 +14,7 @@ import security.formlogin.repository.UserRepository;
 import java.util.ArrayList;
 
 /**
- * 로그인 사용자의 이름을 전달받아 사용자 정보를 가져오는 역할(인증 처리 X)
+ * 로그인 사용자의 이름을 전달받아 사용자 정보를 가져오는 역할(인증 토큰 생성 X)
  * - 유저 이름 조회
  * - 유저 정보 및 권한 정보 전달
  */
