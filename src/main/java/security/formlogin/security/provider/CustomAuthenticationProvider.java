@@ -3,11 +3,13 @@ package security.formlogin.security.provider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import security.formlogin.security.common.FormWebAuthenticationDetails;
 import security.formlogin.security.service.AccountContext;
 import security.formlogin.security.service.CustomUserDetailsService;
 @Component
@@ -33,6 +35,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         if (!passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
             throw new BadCredentialsException("BadCredentialsException");
         }
+
+        // 추가 인증 정보 처리
+        FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
+        String secretKey = formWebAuthenticationDetails.getSecretKey();
+        if (!"secret".equals(secretKey)) {
+            throw new InsufficientAuthenticationException("secretKey 인증 예외");
+        }  
 
         // 비밀번호 매칭 성공시 인증 토큰 생성(비밀번호(credentials)는 보안상 이유로 null 설정
         return new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());

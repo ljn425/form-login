@@ -1,9 +1,11 @@
 package security.formlogin.security.configs;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import security.formlogin.security.common.FormWebAuthenticationDetails;
 import security.formlogin.security.provider.CustomAuthenticationProvider;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -21,6 +24,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final CustomAuthenticationProvider customAuthenticationProvider;
+    private final AuthenticationDetailsSource<HttpServletRequest, FormWebAuthenticationDetails> authenticationDetailsSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,6 +40,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login_proc")
                         .defaultSuccessUrl("/")
+                        .authenticationDetailsSource(authenticationDetailsSource)
                         .permitAll());
 
         return http.build();
