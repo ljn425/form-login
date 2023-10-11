@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import security.formlogin.domain.Account;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();

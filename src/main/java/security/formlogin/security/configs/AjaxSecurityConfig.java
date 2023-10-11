@@ -5,19 +5,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import security.formlogin.security.common.AjaxLoginAuthenticationEntryPoint;
 import security.formlogin.security.filter.AjaxLoginProcessingFilter;
+import security.formlogin.security.handler.AjaxAccessDeniedHandler;
 import security.formlogin.security.handler.AjaxAuthenticationFailureHandler;
 import security.formlogin.security.handler.AjaxAuthenticationSuccessHandler;
 import security.formlogin.security.provider.AjaxAuthenticationProvider;
-import security.formlogin.security.provider.FormAuthenticationProvider;
 
 @EnableWebSecurity
 @Configuration
@@ -26,19 +29,31 @@ import security.formlogin.security.provider.FormAuthenticationProvider;
 public class AjaxSecurityConfig {
 
     private final AjaxAuthenticationProvider ajaxAuthenticationProvider;
-    private final FormAuthenticationProvider formAuthenticationProvider;
     @Bean
     public SecurityFilterChain ajaxFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/api/**")
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/login").permitAll()
+//                        .requestMatchers("/api/messages").permitAll()
+                        .requestMatchers("/api/messages").hasRole("MANAGER")
                         .anyRequest().authenticated())
                 .addFilterBefore(ajaxLoginProcessingFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
+                        .accessDeniedHandler(ajaxAccessDeniedHandler()))
                 .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
 
+    @Bean
+    public AccessDeniedHandler ajaxAccessDeniedHandler() {
+        return new AjaxAccessDeniedHandler();
+    }
+//    @Bean
+//    public AuthenticationEntryPoint ajaxLoginAuthenticationEntryPoint() {
+//        return new AjaxLoginAuthenticationEntryPoint();
+//    }
     @Bean
     public AuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
         return new AjaxAuthenticationSuccessHandler();
@@ -52,7 +67,6 @@ public class AjaxSecurityConfig {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(ajaxAuthenticationProvider);
-        authenticationManagerBuilder.authenticationProvider(formAuthenticationProvider);
         return authenticationManagerBuilder.build();
     }
 

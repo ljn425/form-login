@@ -16,17 +16,17 @@ import security.formlogin.security.handler.FormAccessDeniedHandler;
 import security.formlogin.security.handler.FormAuthenticationFailureHandler;
 import security.formlogin.security.handler.FormAuthenticationSuccessHandler;
 
-@EnableWebSecurity
-@Configuration
+//@EnableWebSecurity
+//@Configuration
 @RequiredArgsConstructor
-@Order(1)
+//@Order(1)
 public class SecurityConfig {
 
     private final AuthenticationDetailsSource<HttpServletRequest, FormWebAuthenticationDetails> authenticationDetailsSource;
     private final FormAuthenticationSuccessHandler formAuthenticationSuccessHandler;
     private final FormAuthenticationFailureHandler formAuthenticationFailureHandler;
 
-    @Bean
+//    @Bean
     public SecurityFilterChain httpFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests

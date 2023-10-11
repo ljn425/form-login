@@ -1,4 +1,4 @@
-### Send request with dynamic variables in request's body
+### 유저 로그인
 POST http://localhost:8080/api/login
 Content-Type: application/json
 X-Requested-With: XMLHttpRequest
@@ -7,3 +7,20 @@ X-Requested-With: XMLHttpRequest
     "username": "user",
     "password": "1234"
 }
+
+### 매니저 로그인
+POST http://localhost:8080/api/login
+Content-Type: application/json
+X-Requested-With: XMLHttpRequest
+
+{
+  "username": "manager",
+  "password": "1234"
+}
+
+### Send request with dynamic variables in request's body
+GET http://localhost:8080/api/messages
+Content-Type: application/json
+X-Requested-With: XMLHttpRequest
+
+###
