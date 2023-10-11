@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
+import security.formlogin.security.handler.CustomAccessDeniedHandler;
 import security.formlogin.security.handler.CustomAuthenticationFailureHandler;
 import security.formlogin.security.handler.CustomAuthenticationSuccessHandler;
 import security.formlogin.security.provider.CustomAuthenticationProvider;
@@ -43,7 +45,9 @@ public class SecurityConfig {
                         .authenticationDetailsSource(authenticationDetailsSource)
                         .successHandler(customAuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-                        .permitAll());
+                        .permitAll())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
     }
@@ -53,6 +57,11 @@ public class SecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
         return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler("/denied");
     }
 
 }
