@@ -18,6 +18,7 @@ import java.io.IOException;
  * - AJax 요청인지 확인
  */
 public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
+    private final ObjectMapper objectMapper = new ObjectMapper();
     public AjaxLoginProcessingFilter(String customFilterProcessUrl) {
         super(customFilterProcessUrl);
     }
@@ -31,7 +32,6 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
         }
 
         // Ajax 요청일 경우 ObjectMapper 를 통해 JSON 데이터(유저 정보)를 읽어옴
-        ObjectMapper objectMapper = new ObjectMapper();
         AccountDto accountDto = objectMapper.readValue(request.getReader(), AccountDto.class);
         if(StringUtils.isEmpty(accountDto.getUsername()) || StringUtils.isEmpty(accountDto.getPassword())) {
             throw new IllegalArgumentException("Username or Password is empty");

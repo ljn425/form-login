@@ -12,9 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
-import security.formlogin.security.handler.CustomAccessDeniedHandler;
-import security.formlogin.security.handler.CustomAuthenticationFailureHandler;
-import security.formlogin.security.handler.CustomAuthenticationSuccessHandler;
+import security.formlogin.security.handler.FormAccessDeniedHandler;
+import security.formlogin.security.handler.FormAuthenticationFailureHandler;
+import security.formlogin.security.handler.FormAuthenticationSuccessHandler;
 
 @EnableWebSecurity
 @Configuration
@@ -23,8 +23,8 @@ import security.formlogin.security.handler.CustomAuthenticationSuccessHandler;
 public class SecurityConfig {
 
     private final AuthenticationDetailsSource<HttpServletRequest, FormWebAuthenticationDetails> authenticationDetailsSource;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final FormAuthenticationSuccessHandler formAuthenticationSuccessHandler;
+    private final FormAuthenticationFailureHandler formAuthenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain httpFilterChain(HttpSecurity http) throws Exception {
@@ -41,8 +41,8 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login_proc")
                         .defaultSuccessUrl("/")
                         .authenticationDetailsSource(authenticationDetailsSource)
-                        .successHandler(customAuthenticationSuccessHandler)
-                        .failureHandler(customAuthenticationFailureHandler)
+                        .successHandler(formAuthenticationSuccessHandler)
+                        .failureHandler(formAuthenticationFailureHandler)
                         .permitAll())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(accessDeniedHandler()));
@@ -52,7 +52,7 @@ public class SecurityConfig {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        return new CustomAccessDeniedHandler("/denied");
+        return new FormAccessDeniedHandler("/denied");
     }
 
 

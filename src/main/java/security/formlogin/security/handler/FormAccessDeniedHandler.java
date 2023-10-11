@@ -7,11 +7,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class FormAccessDeniedHandler implements AccessDeniedHandler {
 
     private final String errorPage;
 
-    public CustomAccessDeniedHandler(String errorPage) {
+    public FormAccessDeniedHandler(String errorPage) {
         this.errorPage = errorPage;
     }
     @Override
