@@ -10,9 +10,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
+import security.formlogin.security.filter.AjaxLoginProcessingFilter;
 import security.formlogin.security.handler.CustomAccessDeniedHandler;
 import security.formlogin.security.handler.CustomAuthenticationFailureHandler;
 import security.formlogin.security.handler.CustomAuthenticationSuccessHandler;
@@ -33,7 +36,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 리소스 허용
-                        .requestMatchers("/", "/users", "/login*").permitAll()
+                        .requestMatchers("/", "/users", "/login*", "/api/login").permitAll()
                         .requestMatchers("/mypage").hasRole("USER")
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
@@ -47,7 +50,9 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler)
                         .permitAll())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedHandler(accessDeniedHandler()));
+                        .accessDeniedHandler(accessDeniedHandler()))
+                .addFilterBefore(ajaxLoginProcessingFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
@@ -62,6 +67,13 @@ public class SecurityConfig {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler("/denied");
+    }
+
+    @Bean
+    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter(HttpSecurity http) throws Exception {
+        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter("/api/login");
+        ajaxLoginProcessingFilter.setAuthenticationManager(authManager(http));
+        return ajaxLoginProcessingFilter;
     }
 
 }
