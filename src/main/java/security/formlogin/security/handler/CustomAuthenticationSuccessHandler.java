@@ -27,7 +27,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private RequestCache requestCache = new HttpSessionRequestCache();
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         setDefaultTargetUrl("/"); // 로그인 성공후 이동할 페이지(Default 설정)
 
         SavedRequest savedRequest = requestCache.getRequest(request, response); // 로그인 성공후 접속하고자 했던 페이지 정보를 가져옴
