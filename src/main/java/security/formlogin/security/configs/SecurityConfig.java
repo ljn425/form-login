@@ -5,38 +5,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
-import security.formlogin.security.filter.AjaxLoginProcessingFilter;
 import security.formlogin.security.handler.CustomAccessDeniedHandler;
 import security.formlogin.security.handler.CustomAuthenticationFailureHandler;
 import security.formlogin.security.handler.CustomAuthenticationSuccessHandler;
-import security.formlogin.security.provider.CustomAuthenticationProvider;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@Order(1)
 public class SecurityConfig {
 
-    private final CustomAuthenticationProvider customAuthenticationProvider;
     private final AuthenticationDetailsSource<HttpServletRequest, FormWebAuthenticationDetails> authenticationDetailsSource;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain httpFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 리소스 허용
-                        .requestMatchers("/", "/users", "/login*", "/api/login").permitAll()
+                        .requestMatchers("/", "/users", "/login*").permitAll()
                         .requestMatchers("/mypage").hasRole("USER")
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
@@ -50,18 +45,9 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler)
                         .permitAll())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedHandler(accessDeniedHandler()))
-                .addFilterBefore(ajaxLoginProcessingFilter(http), UsernamePasswordAuthenticationFilter.class)
-                .csrf(AbstractHttpConfigurer::disable);
+                        .accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(customAuthenticationProvider);
-        return authenticationManagerBuilder.build();
     }
 
     @Bean
@@ -69,11 +55,5 @@ public class SecurityConfig {
         return new CustomAccessDeniedHandler("/denied");
     }
 
-    @Bean
-    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter(HttpSecurity http) throws Exception {
-        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter("/api/login");
-        ajaxLoginProcessingFilter.setAuthenticationManager(authManager(http));
-        return ajaxLoginProcessingFilter;
-    }
 
 }
