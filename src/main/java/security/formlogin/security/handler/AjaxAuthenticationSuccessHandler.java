@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import security.formlogin.domain.Account;
@@ -15,8 +16,10 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
         Account account = (Account) authentication.getPrincipal();
+
+        HttpSession session = request.getSession();
+        session.setAttribute("LOGIN_MEMBER", account);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
