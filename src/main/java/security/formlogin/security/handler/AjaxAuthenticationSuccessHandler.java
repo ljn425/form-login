@@ -7,10 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import security.formlogin.domain.Account;
+import security.formlogin.domain.entity.Account;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();

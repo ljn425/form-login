@@ -3,7 +3,7 @@ package security.formlogin.security.service;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import security.formlogin.domain.Account;
+import security.formlogin.domain.entity.Account;
 
 import java.util.Collection;
 

@@ -1,12 +1,10 @@
 package security.formlogin.controller.user;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import security.formlogin.domain.Account;
-import security.formlogin.domain.AccountDto;
+import security.formlogin.domain.dto.AccountDto;
 import security.formlogin.service.UserService;
 
 @Controller

@@ -9,7 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import security.formlogin.domain.Account;
+import security.formlogin.domain.entity.Account;
+import security.formlogin.security.service.AccountContext;
 
 @Controller
 public class LoginController {
@@ -22,7 +23,7 @@ public class LoginController {
         model.addAttribute("error", error);
         model.addAttribute("exception", exception);
 
-        return "login";
+        return "user/login/login";
     }
 
     @GetMapping("/logout")
@@ -41,8 +42,8 @@ public class LoginController {
                                Authentication authentication,
                                Model model) {
 
-        Account account = (Account) authentication.getPrincipal();
-        model.addAttribute("username", account.getUsername());
+        AccountContext ac = (AccountContext) authentication.getPrincipal();
+        model.addAttribute("username", ac.getAccount().getUsername());
         model.addAttribute("exception", exception);
 
         return "user/login/denied";

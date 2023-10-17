@@ -8,10 +8,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import security.formlogin.domain.Account;
+import security.formlogin.domain.entity.Account;
+import security.formlogin.domain.entity.Role;
 import security.formlogin.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 로그인 사용자의 이름을 전달받아 사용자 정보를 가져오는 역할(인증 토큰 생성 X)
@@ -29,9 +33,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         Account account = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not Found Username"));
 
-        ArrayList<GrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(account.getRole()));
+        List<GrantedAuthority> collect = account.getUserRoles()
+                .stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toSet())
+                .stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 
-        return new AccountContext(account, roles);
+        return new AccountContext(account, collect);
     }
 }
