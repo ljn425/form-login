@@ -17,10 +17,12 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.security.web.access.intercept.RequestMatcherDelegatingAuthorizationManager;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
+import security.formlogin.security.factory.UrlResourcesMapFactoryBean;
 import security.formlogin.security.handler.FormAccessDeniedHandler;
 import security.formlogin.security.handler.FormAuthenticationFailureHandler;
 import security.formlogin.security.handler.FormAuthenticationSuccessHandler;
 import security.formlogin.security.metadatasource.MyCustomRequestMatcher;
+import security.formlogin.security.service.SecurityResourceService;
 
 @EnableWebSecurity
 @Configuration
@@ -31,6 +33,7 @@ public class SecurityConfig {
     private final AuthenticationDetailsSource<HttpServletRequest, FormWebAuthenticationDetails> authenticationDetailsSource;
     private final FormAuthenticationSuccessHandler formAuthenticationSuccessHandler;
     private final FormAuthenticationFailureHandler formAuthenticationFailureHandler;
+    private final SecurityResourceService securityResourceService;
 
     @Bean
     public SecurityFilterChain httpFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> auzm) throws Exception {
@@ -62,6 +65,10 @@ public class SecurityConfig {
         return new FormAccessDeniedHandler("/denied");
     }
 
+    @Bean
+    public UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
+        return new UrlResourcesMapFactoryBean(securityResourceService);
+    }
 
 
 
