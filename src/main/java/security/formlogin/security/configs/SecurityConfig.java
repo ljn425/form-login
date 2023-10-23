@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
-import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import security.formlogin.domain.entity.Resources;
@@ -26,9 +24,7 @@ import security.formlogin.security.handler.FormAuthenticationFailureHandler;
 import security.formlogin.security.handler.FormAuthenticationSuccessHandler;
 import security.formlogin.security.service.SecurityResourceService;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,7 +73,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UrlResourcesMapFactoryBeanV2 urlResourcesMapFactoryBean() {
+    public UrlResourcesMapFactoryBeanV2 urlResourcesMapFactoryBeanV2() {
         return new UrlResourcesMapFactoryBeanV2(securityResourceService);
     }
 

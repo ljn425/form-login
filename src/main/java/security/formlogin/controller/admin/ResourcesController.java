@@ -11,6 +11,7 @@ import security.formlogin.domain.dto.ResourcesDto;
 import security.formlogin.domain.entity.Resources;
 import security.formlogin.domain.entity.Role;
 import security.formlogin.repository.RoleRepository;
+import security.formlogin.security.metadatasource.CustomAuthorizationManagerV2;
 import security.formlogin.service.ResourcesService;
 import security.formlogin.service.RoleService;
 
@@ -26,9 +27,10 @@ public class ResourcesController {
     private final RoleRepository roleRepository;
     private final RoleService roleService;
     private final ModelMapper modelMapper;
+    private final CustomAuthorizationManagerV2 customAuthorizationManagerV2;
 
     @GetMapping("/admin/resources")
-    public String getResources(Model model) throws Exception {
+    public String getResources(Model model) {
         List<Resources> resources = resourcesService.getResources();
         model.addAttribute("resources", resources);
 
@@ -43,7 +45,10 @@ public class ResourcesController {
         Resources resources = modelMapper.map(resourcesDto, Resources.class);
         resources.updateRoleSet(roles);
 
+
         resourcesService.createResources(resources);
+
+        customAuthorizationManagerV2.reload();
 
         return "redirect:/admin/resources";
     }
@@ -75,10 +80,12 @@ public class ResourcesController {
     }
 
     @GetMapping("/admin/resources/delete/{id}")
-    public String removeResources(@PathVariable long id, Model model) throws Exception {
+    public String removeResources(@PathVariable long id) {
 
         Resources resources = resourcesService.getResources(id);
-        resourcesService.deleteResources(id);
+        resourcesService.deleteResources(resources.getId());
+
+        customAuthorizationManagerV2.reload();
 
         return "redirect:/admin/resources";
     }
