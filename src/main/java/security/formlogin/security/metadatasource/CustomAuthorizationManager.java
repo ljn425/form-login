@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@Component
+//@Component
 public class CustomAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
     private LinkedHashMap<RequestMatcher, ConfigAttribute> requestMap = new LinkedHashMap<>();
 

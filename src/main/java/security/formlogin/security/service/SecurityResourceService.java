@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import security.formlogin.domain.entity.Resources;
 import security.formlogin.repository.ResourcesRepository;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -29,5 +30,22 @@ public class SecurityResourceService {
             });
         });
         return result;
+    }
+
+    public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getResourceListV2() {
+        LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
+        List<Resources> resourcesList = resourcesRepository.findAllByOrderByOrderNumDesc();
+        resourcesList.forEach(re -> {
+            re.getRoleSet().forEach(role -> {
+                AntPathRequestMatcher resourceName = new AntPathRequestMatcher(re.getResourceName());
+                SecurityConfig roleName = new SecurityConfig(role.getRoleName());
+                if(requestMap.containsKey(resourceName)) {
+                    requestMap.get(resourceName).add(roleName);
+                } else {
+                    requestMap.put(resourceName, new ArrayList<>(List.of(roleName)));
+                }
+            });
+        });
+        return requestMap;
     }
 }

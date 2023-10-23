@@ -6,23 +6,31 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
-import org.springframework.security.web.access.intercept.RequestMatcherDelegatingAuthorizationManager;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import security.formlogin.domain.entity.Resources;
+import security.formlogin.repository.ResourcesRepository;
 import security.formlogin.security.common.FormWebAuthenticationDetails;
-import security.formlogin.security.factory.UrlResourcesMapFactoryBean;
+import security.formlogin.security.factory.UrlResourcesMapFactoryBeanV2;
 import security.formlogin.security.handler.FormAccessDeniedHandler;
 import security.formlogin.security.handler.FormAuthenticationFailureHandler;
 import security.formlogin.security.handler.FormAuthenticationSuccessHandler;
-import security.formlogin.security.metadatasource.MyCustomRequestMatcher;
 import security.formlogin.security.service.SecurityResourceService;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @EnableWebSecurity
 @Configuration
@@ -34,6 +42,7 @@ public class SecurityConfig {
     private final FormAuthenticationSuccessHandler formAuthenticationSuccessHandler;
     private final FormAuthenticationFailureHandler formAuthenticationFailureHandler;
     private final SecurityResourceService securityResourceService;
+    private final ResourcesRepository resourcesRepository;
 
     @Bean
     public SecurityFilterChain httpFilterChain(HttpSecurity http, AuthorizationManager<RequestAuthorizationContext> auzm) throws Exception {
@@ -45,7 +54,9 @@ public class SecurityConfig {
 //                        .requestMatchers("/messages").hasRole("MANAGER")
 //                        .requestMatchers("/config").hasRole("ADMIN")
 //                        .anyRequest().access(authz))
-                        .anyRequest().access(auzm))
+
+                        .requestMatchers(getAccessResource()).access(auzm)
+                        .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         .loginProcessingUrl("/login_proc")
@@ -66,12 +77,28 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
-        return new UrlResourcesMapFactoryBean(securityResourceService);
+    public UrlResourcesMapFactoryBeanV2 urlResourcesMapFactoryBean() {
+        return new UrlResourcesMapFactoryBeanV2(securityResourceService);
     }
 
+    private RequestMatcher[] getAccessResource() {
+        List<Resources> resourcesList = resourcesRepository.findAllByOrderByOrderNumDesc();
 
+        HashSet<String> resourceSet = resourcesList.stream()
+                .map(Resources::getResourceName)
+                .collect(Collectors.toCollection(HashSet::new));
 
-
-
+        return resourceSet.stream()
+                .map(AntPathRequestMatcher::new)
+                .toArray(RequestMatcher[]::new);
+    }
 }
+
+
+
+
+
+
+
+
+

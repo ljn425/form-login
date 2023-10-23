@@ -20,8 +20,8 @@ import security.formlogin.security.handler.AjaxAuthenticationFailureHandler;
 import security.formlogin.security.handler.AjaxAuthenticationSuccessHandler;
 import security.formlogin.security.provider.AjaxAuthenticationProvider;
 
-@EnableWebSecurity
-@Configuration
+//@EnableWebSecurity
+//@Configuration
 @RequiredArgsConstructor
 @Order(0)
 public class AjaxSecurityConfig {
