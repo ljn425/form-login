@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @Configuration
 @RequiredArgsConstructor
 @Order(1)
@@ -46,11 +48,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 리소스 허용
                         .requestMatchers("/", "/users", "/login*").permitAll()
-//                        .requestMatchers(new MyCustomRequestMatcher()).hasRole("USER")
-//                        .requestMatchers("/messages").hasRole("MANAGER")
-//                        .requestMatchers("/config").hasRole("ADMIN")
-//                        .anyRequest().access(authz))
-
                         .requestMatchers(getAccessResource()).access(auzm)
                         .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
